@@ -48,12 +48,13 @@
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES		( 5 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 17 * 1024 ) )
+//#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 17 * 1024 ) )
 #define configMAX_TASK_NAME_LEN		( 16 )
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
 #define configSUPPORT_STATIC_ALLOCATION	1
+#define configSUPPORT_DYNAMIC_ALLOCATION	0
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 		0
@@ -71,7 +72,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelay				1
 
 /*Software timer related functions.*/
-#define configUSE_TIMERS					1
+#define configUSE_TIMERS					0
 #define configTIMER_QUEUE_LENGTH	5
 #define configTIMER_TASK_PRIORITY		3
 #define configTIMER_TASK_STACK_DEPTH 100

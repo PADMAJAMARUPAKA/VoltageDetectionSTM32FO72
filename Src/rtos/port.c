@@ -334,6 +334,7 @@ __asm void xPortPendSVHandler( void )
 void xPortSysTickHandler( void )
 {
     uint32_t ulPreviousMask;
+		
 
     ulPreviousMask = portSET_INTERRUPT_MASK_FROM_ISR();
     {

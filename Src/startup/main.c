@@ -20,6 +20,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
 
 /** @addtogroup STM32F0xx_HAL_Examples
   * @{
@@ -38,7 +41,7 @@ static GPIO_InitTypeDef  GPIO_InitStruct;
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
-
+void vLedTask(void *pvParameters);
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -67,42 +70,47 @@ int main(void)
   
   /* -1- Enable each GPIO Clock (to be able to program the configuration registers) */
   LED3_GPIO_CLK_ENABLE();
-  LED4_GPIO_CLK_ENABLE();
-  LED5_GPIO_CLK_ENABLE();
-  LED6_GPIO_CLK_ENABLE();
+  //LED4_GPIO_CLK_ENABLE();
+  //LED5_GPIO_CLK_ENABLE();
+  //LED6_GPIO_CLK_ENABLE();
 
   /* -2- Configure IOs in output push-pull mode to drive external LEDs */
   GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull  = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
-  GPIO_InitStruct.Pin = LED3_PIN;
-  HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = LED4_PIN;
+  //GPIO_InitStruct.Pin = LED3_PIN;
+  //HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+	 GPIO_InitStruct.Pin = LED4_PIN;
   HAL_GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStruct);
+	 StaticTask_t xTaskBuffer;
+	 StackType_t xStack[ 150 ];
+	xTaskCreateStatic( vLedTask,"ledtask",150,NULL,4,xStack,&xTaskBuffer);
+	vTaskStartScheduler();
 
-  GPIO_InitStruct.Pin = LED5_PIN;
-  HAL_GPIO_Init(LED5_GPIO_PORT, &GPIO_InitStruct);
+ 
 
-  GPIO_InitStruct.Pin = LED6_PIN;
-  HAL_GPIO_Init(LED6_GPIO_PORT, &GPIO_InitStruct);
+  //GPIO_InitStruct.Pin = LED5_PIN;
+  //HAL_GPIO_Init(LED5_GPIO_PORT, &GPIO_InitStruct);
+
+  //GPIO_InitStruct.Pin = LED6_PIN;
+  //HAL_GPIO_Init(LED6_GPIO_PORT, &GPIO_InitStruct);
 
   /* -3- Toggle IOs in an infinite loop */
   while (1)
   {
-    HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+    //HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
     /* Insert delay 100 ms */
-    HAL_Delay(100);
-    HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+    //HAL_Delay(100);
+    //HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
     /* Insert delay 100 ms */
-    HAL_Delay(100);
-    HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+    //HAL_Delay(100);
+    //HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
     /* Insert delay 100 ms */
-    HAL_Delay(100);
-    HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+    //HAL_Delay(100);
+    //HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
     /* Insert delay 100 ms */
-    HAL_Delay(100);
+    //HAL_Delay(100);
   }
 }
 
@@ -192,3 +200,9 @@ void assert_failed(uint8_t *file, uint32_t line)
   */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+void vLedTask(void *pvParameters){
+	for(;;){
+	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	//vTaskDelay(pdMS_TO_TICKS(1000));
+	}
+}
