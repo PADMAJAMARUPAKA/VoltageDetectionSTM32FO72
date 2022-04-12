@@ -42,6 +42,7 @@ static GPIO_InitTypeDef  GPIO_InitStruct;
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 void vLedTask(void *pvParameters);
+void vLedTask2(void *pvParameters);
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -70,8 +71,8 @@ int main(void)
   
   /* -1- Enable each GPIO Clock (to be able to program the configuration registers) */
   LED3_GPIO_CLK_ENABLE();
-  //LED4_GPIO_CLK_ENABLE();
-  //LED5_GPIO_CLK_ENABLE();
+  LED4_GPIO_CLK_ENABLE();
+  LED5_GPIO_CLK_ENABLE();
   //LED6_GPIO_CLK_ENABLE();
 
   /* -2- Configure IOs in output push-pull mode to drive external LEDs */
@@ -79,19 +80,23 @@ int main(void)
   GPIO_InitStruct.Pull  = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
-  //GPIO_InitStruct.Pin = LED3_PIN;
-  //HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LED3_PIN;
+  HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
 	 GPIO_InitStruct.Pin = LED4_PIN;
   HAL_GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStruct);
 	 StaticTask_t xTaskBuffer;
 	 StackType_t xStack[ 150 ];
-	xTaskCreateStatic( vLedTask,"ledtask",150,NULL,4,xStack,&xTaskBuffer);
+	 StaticTask_t xTaskBuffer2;
+	 StackType_t xStack2[ 150 ];
+	xTaskCreateStatic( vLedTask,"ledtask",150,NULL,3,xStack,&xTaskBuffer);
+	//xTaskCreateStatic( vLedTask2,"ledtask",150,NULL,4,xStack2,&xTaskBuffer2);
+	
 	vTaskStartScheduler();
 
  
 
-  //GPIO_InitStruct.Pin = LED5_PIN;
-  //HAL_GPIO_Init(LED5_GPIO_PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = LED5_PIN;
+  HAL_GPIO_Init(LED5_GPIO_PORT, &GPIO_InitStruct);
 
   //GPIO_InitStruct.Pin = LED6_PIN;
   //HAL_GPIO_Init(LED6_GPIO_PORT, &GPIO_InitStruct);
@@ -202,7 +207,20 @@ void assert_failed(uint8_t *file, uint32_t line)
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 void vLedTask(void *pvParameters){
 	for(;;){
-	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-	//vTaskDelay(pdMS_TO_TICKS(1000));
+		//eTaskGetState(
+	//TickType_t present;
+		//present =xTaskGetTickCount();
+	HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+	//HAL_GPIO_WritePin(LED3_GPIO_PORT,LED3_PIN,GPIO_PIN_SET);
+		vTaskDelay(pdMS_TO_TICKS(1000));
+	//vTaskDelay(1000/portTICK_PERIOD_MS);
 	}
 }
+
+	//void vLedTask2(void *pvParameters){
+	//for(;;){
+	//HAL_GPIO_WritePin(LED4_GPIO_PORT,LED4_PIN,GPIO_PIN_SET);
+	//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);	
+		//vTaskDelay(1000/portTICK_PERIOD_MS);
+	//}
+//}

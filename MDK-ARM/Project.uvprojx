@@ -474,11 +474,6 @@
               <FilePath>..\Src\rtos\list.c</FilePath>
             </File>
             <File>
-              <FileName>port.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\rtos\port.c</FilePath>
-            </File>
-            <File>
               <FileName>queue.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\rtos\queue.c</FilePath>
@@ -497,6 +492,11 @@
               <FileName>event_groups.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\rtos\event_groups.c</FilePath>
+            </File>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\rtos\port.c</FilePath>
             </File>
           </Files>
         </Group>
