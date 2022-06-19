@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "timer.h"
 
 /** @addtogroup STM32F0xx_HAL_Examples
   * @{
@@ -38,6 +39,7 @@ static GPIO_InitTypeDef  GPIO_InitStruct;
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
+
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -64,46 +66,23 @@ int main(void)
 
   /* Configure the system clock to 48 MHz */
   SystemClock_Config();
-  
-  /* -1- Enable each GPIO Clock (to be able to program the configuration registers) */
-  LED3_GPIO_CLK_ENABLE();
-  LED4_GPIO_CLK_ENABLE();
-  LED5_GPIO_CLK_ENABLE();
-  LED6_GPIO_CLK_ENABLE();
-
-  /* -2- Configure IOs in output push-pull mode to drive external LEDs */
-  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+	//Configure LED4
+	LED4_GPIO_CLK_ENABLE();
+	GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull  = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-
-  GPIO_InitStruct.Pin = LED3_PIN;
-  HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = LED4_PIN;
+	GPIO_InitStruct.Pin = LED4_PIN;
   HAL_GPIO_Init(LED4_GPIO_PORT, &GPIO_InitStruct);
+	//Configure Timer Gpio
+	TimerGpio_Init();
+	//Configure Timer Peripheral Registers.
+	Timer3_Init();
 
-  GPIO_InitStruct.Pin = LED5_PIN;
-  HAL_GPIO_Init(LED5_GPIO_PORT, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = LED6_PIN;
-  HAL_GPIO_Init(LED6_GPIO_PORT, &GPIO_InitStruct);
-
-  /* -3- Toggle IOs in an infinite loop */
+  
   while (1)
   {
-    HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-    /* Insert delay 100 ms */
-    HAL_Delay(100);
-    HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-    /* Insert delay 100 ms */
-    HAL_Delay(100);
-    HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
-    /* Insert delay 100 ms */
-    HAL_Delay(100);
-    HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
-    /* Insert delay 100 ms */
-    HAL_Delay(100);
-  }
+	}
+	
 }
 
 /**
@@ -121,6 +100,15 @@ int main(void)
   * @param  None
   * @retval None
   */
+
+static void SystemClock_Configuration(void)
+{
+	
+		RCC->CR2 |= RCC_CR2_HSI48ON;
+		while ( RCC_CR2_HSI48RDY ==0){
+		}
+		//RCC->CFGR |=RCC_CFGR_SW_HSI48;		
+}
 static void SystemClock_Config(void)
 {
   RCC_ClkInitTypeDef RCC_ClkInitStruct;

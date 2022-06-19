@@ -77,7 +77,8 @@ void SVC_Handler(void)
 
 
 /**
-  * @brief  This function handles PendSVC exception.
+  * @brief  This function handle
+s PendSVC exception.
   * @param  None
   * @retval None
   */
@@ -93,6 +94,13 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   HAL_IncTick();
+}
+
+void TIM3_IRQHandler(void){
+
+	TIM3->SR &= (~TIM_SR_UIF);
+	HAL_GPIO_TogglePin(LED4_GPIO_PORT,LED4_PIN);
+	
 }
 
 /******************************************************************************/
