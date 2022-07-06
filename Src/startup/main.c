@@ -22,6 +22,7 @@
 #include "main.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "timers.h"
 
 
 /** @addtogroup STM32F0xx_HAL_Examples
@@ -35,13 +36,17 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
+#define SoftwareTimerPeriod1 pdMS_TO_TICKS(1000);
 /* Private variables ---------------------------------------------------------*/
 static GPIO_InitTypeDef  GPIO_InitStruct;
+TimerHandle_t SoftwareTimer;
+
 
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 void vLedTask(void *pvParameters);
+void AutoReloadTimerCallback( TimerHandle_t xTimer );
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -77,12 +82,39 @@ int main(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Pin = LED3_PIN;
   HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+	//LED4 INTIALIZATION
+	  LED4_GPIO_CLK_ENABLE();
+	/* -2- Configure IOs in output push-pull mode to drive external LEDs */
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.Pin = LED4_PIN;
+  HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+	
 	//Create a StaticTask of highest priority to Toggle the LED every 1 second.
 	StaticTask_t xTaskBuffer;
 	StackType_t xStack[ 150 ];
-	xTaskCreateStatic( vLedTask,"ledtask",150,NULL,4,xStack,&xTaskBuffer);
-	vTaskStartScheduler();
-  
+	xTaskCreateStatic( vLedTask,"ledtask",150,NULL,4,xStack,&xTaskBuffer); 
+	
+	// Create a StaticTimer (auto reload timer) to toggle the LED4 every 1second.
+	StaticTimer_t TimerBuffer;
+	BaseType_t xTimer1Started;
+	
+	SoftwareTimer = xTimerCreateStatic("SoftwareTimer",pdMS_TO_TICKS(1000), pdTRUE ,0, AutoReloadTimerCallback ,&TimerBuffer);
+	
+	if(  SoftwareTimer != NULL )
+	{
+	/* Start the software timers, using a block time of 0 (no block time). The scheduler has
+	not been started yet so any block time specified here would be ignored anyway. */
+	xTimer1Started = xTimerStart( SoftwareTimer, 0 );
+		
+		if(  xTimer1Started == pdPASS )
+		{
+		/* Start the scheduler. */
+		vTaskStartScheduler();
+		}
+	}
+
 	while (1)
   {
 
@@ -183,4 +215,7 @@ void vLedTask(void *pvParameters){
 
 	}
 }
-
+void AutoReloadTimerCallback( TimerHandle_t xTimer ) {
+	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	
+}
