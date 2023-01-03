@@ -23,6 +23,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
+#include "watchdog.h"
 
 
 /** @addtogroup STM32F0xx_HAL_Examples
@@ -45,7 +46,7 @@ TimerHandle_t SoftwareTimer;
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
-void vLedTask(void *pvParameters);
+void vWatchdogTask(void *pvParameters);
 void AutoReloadTimerCallback( TimerHandle_t xTimer );
 
 /* Private functions ---------------------------------------------------------*/
@@ -69,6 +70,7 @@ int main(void)
          handled in milliseconds basis.
        - Low Level Initialization
      */
+
   HAL_Init();
 
   /* Configure the system clock to 48 MHz */
@@ -90,36 +92,48 @@ int main(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Pin = LED4_PIN;
   HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+	//WATCHDOG INTIALIZATION
+	if((RCC->CSR & RCC_CSR_IWDGRSTF) == 0X20000000)
+	{
+		HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+
+	}
+	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	watchdog_init();
 	
+
 	//Create a StaticTask of highest priority to Toggle the LED every 1 second.
 	StaticTask_t xTaskBuffer;
 	StackType_t xStack[ 150 ];
-	xTaskCreateStatic( vLedTask,"ledtask",150,NULL,4,xStack,&xTaskBuffer); 
+	xTaskCreateStatic( vWatchdogTask,"watchdog",150,NULL,4,xStack,&xTaskBuffer); 
 	
 	// Create a StaticTimer (auto reload timer) to toggle the LED4 every 1second.
-	StaticTimer_t TimerBuffer;
-	BaseType_t xTimer1Started;
+	//StaticTimer_t TimerBuffer;
+	//BaseType_t xTimer1Started;
 	
-	SoftwareTimer = xTimerCreateStatic("SoftwareTimer",pdMS_TO_TICKS(1000), pdTRUE ,0, AutoReloadTimerCallback ,&TimerBuffer);
+	//SoftwareTimer = xTimerCreateStatic("SoftwareTimer",pdMS_TO_TICKS(1000), pdTRUE ,0, AutoReloadTimerCallback ,&TimerBuffer);
 	
-	if(  SoftwareTimer != NULL )
-	{
-	/* Start the software timers, using a block time of 0 (no block time). The scheduler has
-	not been started yet so any block time specified here would be ignored anyway. */
-	xTimer1Started = xTimerStart( SoftwareTimer, 0 );
+	//if(  SoftwareTimer != NULL )
+	//{
+		// Start the software timers, using a block time of 0 (no block time). The scheduler has
+	//not been started yet so any block time specified here would be ignored anyway. 
+	//xTimer1Started = xTimerStart( SoftwareTimer, 0 );
 		
-		if(  xTimer1Started == pdPASS )
-		{
-		/* Start the scheduler. */
-		vTaskStartScheduler();
-		}
-	}
+		//if(  xTimer1Started == pdPASS )
+		//{
+		 //Start the scheduler.
+			vTaskStartScheduler();
+		//}
+	//}
 
 	while (1)
   {
 
   }
 }
+
+
+
 
 /**
   * @brief  System Clock Configuration
@@ -208,10 +222,10 @@ void assert_failed(uint8_t *file, uint32_t line)
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 //LED Function to toggle the LED 3.
-void vLedTask(void *pvParameters){
+void vWatchdogTask(void *pvParameters){
 	for(;;){
-	HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-	vTaskDelay(pdMS_TO_TICKS(1000));
+		feed_watchdog();
+		vTaskDelay(pdMS_TO_TICKS(6000));
 
 	}
 }
