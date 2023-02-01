@@ -86,8 +86,9 @@ void EXTI0_1_IRQHandler(void)
 	//RV 
 	if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_RESET)
 	{
-		HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-			//xSemaphoreGiveFromISR( xResumeSemaphore, &xHigherPriorityTaskWoken );
+		//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+			xSemaphoreGiveFromISR( xResumeSemaphore, &xHigherPriorityTaskWoken );
+			EXTI->PR=0x00000001;
 	}
 	if(xHigherPriorityTaskWoken == pdTRUE){
 //HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);	

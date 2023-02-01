@@ -130,14 +130,14 @@ int main(void)
 //Create a StaticTask of highest priority to Toggle the LED every 1 second.
 	StaticTask_t xTaskBuffer;
 	StackType_t xStack[ 70 ];
-	watchdog_handle=xTaskCreateStatic( vWatchdogTask,"watchdog",70,NULL,4,xStack,&xTaskBuffer); 
+	watchdog_handle=xTaskCreateStatic( vWatchdogTask,"watchdog",70,NULL,3,xStack,&xTaskBuffer); 
 	//Create a StaticTask to suspend watchdogservicing task.
 	StaticTask_t xTaskBuffer2;
 	StackType_t xStack2[ 90 ];
 	xTaskCreateStatic( vSuspensionTask,"suspensionTask",90,NULL,4,xStack2,&xTaskBuffer2);
 	StaticTask_t xTaskBuffer3;
 	StackType_t xStack3[ 70 ];
-	//xTaskCreateStatic( vResumeTask,"resumeTask",70,NULL,4,xStack3,&xTaskBuffer3); 
+	xTaskCreateStatic( vResumeTask,"resumeTask",70,NULL,4,xStack3,&xTaskBuffer3); 
 	//Start the scheduler.
 	vTaskStartScheduler();
 	while (1)
@@ -230,31 +230,28 @@ void assert_failed(uint8_t *file, uint32_t line)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/*********=********** (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 /**
-  * @brief  Task to feed the watchdog 
-	
-  * @param  None
-  * @retval None
+  * @brief  Ta==ato feed the watchdog 
+=
+  * @param  None* @retval None
   */
 
 void vWatchdogTask(void *pvParameters){
 	for(;;){
 		feed_watchdog();
-		HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
-	
-		vTaskDelay(pdMS_TO_TICKS(2000));
-					
+	HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+	vTaskDelay(pdMS_TO_TICKS(2000));
 	}
 }
-
- static void vSuspensionTask(void *pvParameters){
+		
+	static void vSuspensionTask(void *pvParameters){
 	for(;;){
 		//HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
 		//vTaskDelay(pdMS_TO_TICKS(1000));
 		xSemaphoreTake( xSuspendSemaphore,portMAX_DELAY);
 		HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
-		//vTaskSuspend(watchdog_handle);
+		vTaskSuspend(watchdog_handle);
 		//}
 		//else {
 			//	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
@@ -267,7 +264,7 @@ void vResumeTask(void *pvParameters){
 		
 		//vTaskDelay(pdMS_TO_TICKS(1000));
 	xSemaphoreTake( xResumeSemaphore, portMAX_DELAY );
-	HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
 	vTaskResume(watchdog_handle);
 	}
 }
