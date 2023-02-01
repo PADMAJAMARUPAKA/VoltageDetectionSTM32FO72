@@ -24,6 +24,13 @@
 #include "task.h"
 #include "timers.h"
 #include "watchdog.h"
+#include "event_groups.h"
+#include "semphr.h"
+
+SemaphoreHandle_t xSuspendSemaphore;
+SemaphoreHandle_t xResumeSemaphore;
+StaticSemaphore_t xSemaphoreBuffer1;
+StaticSemaphore_t xSemaphoreBuffer2;
 
 
 /** @addtogroup STM32F0xx_HAL_Examples
@@ -34,22 +41,19 @@
   * @{
   */
 
+TaskHandle_t watchdog_handle;
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
-#define SoftwareTimerPeriod1 pdMS_TO_TICKS(1000);
 /* Private variables ---------------------------------------------------------*/
 static GPIO_InitTypeDef  GPIO_InitStruct;
-TimerHandle_t SoftwareTimer;
-
-
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void Error_Handler(void);
 void vWatchdogTask(void *pvParameters);
-void AutoReloadTimerCallback( TimerHandle_t xTimer );
-
-/* Private functions ---------------------------------------------------------*/
+static void vSuspensionTask(void *pvParameters);
+static void vResumeTask(void *pvParameters);
 
 /**
   * @brief  Main program
@@ -75,7 +79,8 @@ int main(void)
 
   /* Configure the system clock to 48 MHz */
   SystemClock_Config();
-  
+  //HAL_NVIC_EnableIRQ(PendSV_IRQn);
+	//HAL_NVIC_SetPriority(PendSV_IRQn,3,0);
   /* -1- Enable each GPIO Clock (to be able to program the configuration registers) */
   LED3_GPIO_CLK_ENABLE();
 	/* -2- Configure IOs in output push-pull mode to drive external LEDs */
@@ -92,49 +97,54 @@ int main(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Pin = LED4_PIN;
   HAL_GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStruct);
+	/* -2- Configure IOs in output push-pull mode to drive external LEDs */
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.Pin = LED5_PIN;
+  HAL_GPIO_Init(LED5_GPIO_PORT, &GPIO_InitStruct);
+	 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.Pin = LED6_PIN;
+  HAL_GPIO_Init(LED6_GPIO_PORT, &GPIO_InitStruct);
 	//WATCHDOG INTIALIZATION
 	if((RCC->CSR & RCC_CSR_IWDGRSTF) == 0X20000000)
 	{
 		HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+		RCC->CSR |= RCC_CSR_RMVF;
 
 	}
-	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	
 	watchdog_init();
+	//Button intialization
+	BSP_PB_Init(BUTTON_USER,BUTTON_MODE_EXTI);
 	
-
-	//Create a StaticTask of highest priority to Toggle the LED every 1 second.
-	StaticTask_t xTaskBuffer;
-	StackType_t xStack[ 150 ];
-	xTaskCreateStatic( vWatchdogTask,"watchdog",150,NULL,4,xStack,&xTaskBuffer); 
-	
-	// Create a StaticTimer (auto reload timer) to toggle the LED4 every 1second.
-	//StaticTimer_t TimerBuffer;
-	//BaseType_t xTimer1Started;
-	
-	//SoftwareTimer = xTimerCreateStatic("SoftwareTimer",pdMS_TO_TICKS(1000), pdTRUE ,0, AutoReloadTimerCallback ,&TimerBuffer);
-	
-	//if(  SoftwareTimer != NULL )
-	//{
-		// Start the software timers, using a block time of 0 (no block time). The scheduler has
-	//not been started yet so any block time specified here would be ignored anyway. 
-	//xTimer1Started = xTimerStart( SoftwareTimer, 0 );
-		
-		//if(  xTimer1Started == pdPASS )
-		//{
-		 //Start the scheduler.
-			vTaskStartScheduler();
-		//}
+	xSuspendSemaphore = xSemaphoreCreateBinaryStatic(&xSemaphoreBuffer1);
+	xResumeSemaphore = xSemaphoreCreateBinaryStatic(&xSemaphoreBuffer2);
+	//if(xSuspendSemaphore!=NULL){
+		//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
 	//}
+	
 
+//Create a StaticTask of highest priority to Toggle the LED every 1 second.
+	StaticTask_t xTaskBuffer;
+	StackType_t xStack[ 70 ];
+	watchdog_handle=xTaskCreateStatic( vWatchdogTask,"watchdog",70,NULL,4,xStack,&xTaskBuffer); 
+	//Create a StaticTask to suspend watchdogservicing task.
+	StaticTask_t xTaskBuffer2;
+	StackType_t xStack2[ 90 ];
+	xTaskCreateStatic( vSuspensionTask,"suspensionTask",90,NULL,4,xStack2,&xTaskBuffer2);
+	StaticTask_t xTaskBuffer3;
+	StackType_t xStack3[ 70 ];
+	//xTaskCreateStatic( vResumeTask,"resumeTask",70,NULL,4,xStack3,&xTaskBuffer3); 
+	//Start the scheduler.
+	vTaskStartScheduler();
 	while (1)
   {
 
   }
 }
-
-
-
-
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow : 
@@ -221,15 +231,44 @@ void assert_failed(uint8_t *file, uint32_t line)
   */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-//LED Function to toggle the LED 3.
+/**
+  * @brief  Task to feed the watchdog 
+	
+  * @param  None
+  * @retval None
+  */
+
 void vWatchdogTask(void *pvParameters){
 	for(;;){
 		feed_watchdog();
-		vTaskDelay(pdMS_TO_TICKS(6000));
-
+		HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+	
+		vTaskDelay(pdMS_TO_TICKS(2000));
+					
 	}
 }
-void AutoReloadTimerCallback( TimerHandle_t xTimer ) {
-	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-	
+
+ static void vSuspensionTask(void *pvParameters){
+	for(;;){
+		//HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+		//vTaskDelay(pdMS_TO_TICKS(1000));
+		xSemaphoreTake( xSuspendSemaphore,portMAX_DELAY);
+		HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+		//vTaskSuspend(watchdog_handle);
+		//}
+		//else {
+			//	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+				//vTaskDelay(pdMS_TO_TICKS(1000));
+		//}
+	}
 }
+void vResumeTask(void *pvParameters){
+	for(;;){
+		
+		//vTaskDelay(pdMS_TO_TICKS(1000));
+	xSemaphoreTake( xResumeSemaphore, portMAX_DELAY );
+	HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+	vTaskResume(watchdog_handle);
+	}
+}
+

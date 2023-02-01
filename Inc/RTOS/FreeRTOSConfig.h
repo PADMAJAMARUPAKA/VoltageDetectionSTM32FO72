@@ -45,12 +45,12 @@
 #define configUSE_IDLE_HOOK			0
 #define configUSE_TICK_HOOK			0
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 48000000 )	
-	
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION	0
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES		( 5 )
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
+#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 500 )
 //#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 17 * 1024 ) )
-#define configMAX_TASK_NAME_LEN		( 16 )
+#define configMAX_TASK_NAME_LEN		( 20 )
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
 #define configIDLE_SHOULD_YIELD		1
@@ -71,7 +71,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskSuspend			1
 #define INCLUDE_vTaskDelayUntil			1
 #define INCLUDE_vTaskDelay				1
-
+#define INCLUDE_vTaskResume 			1
 /*Software timer related functions.*/
 #define configUSE_TIMERS					1
 #define configTIMER_QUEUE_LENGTH	5
@@ -85,6 +85,7 @@ to exclude the API function. */
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	63/* equivalent to 0xb0, or priority 11. */
 #define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
+
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 #define vPortSVCHandler SVC_Handler
