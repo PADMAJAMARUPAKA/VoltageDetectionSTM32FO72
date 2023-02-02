@@ -23,6 +23,7 @@
 #include "main.h"
 #include "stm32f0xx_it.h"
 #include "stm32f0xx_hal_exti.h"
+
 extern SemaphoreHandle_t xSuspendSemaphore;
 extern SemaphoreHandle_t xResumeSemaphore;
 extern StaticSemaphore_t xSemaphoreBuffer1;

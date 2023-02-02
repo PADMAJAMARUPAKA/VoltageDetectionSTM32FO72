@@ -499,6 +499,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\rtos\port.c</FilePath>
             </File>
+            <File>
+              <FileName>tasks_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\rtos\tasks_list.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -508,6 +513,16 @@
               <FileName>watchdog.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\watchdog\watchdog.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LED</GroupName>
+          <Files>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\led\led.c</FilePath>
             </File>
           </Files>
         </Group>
