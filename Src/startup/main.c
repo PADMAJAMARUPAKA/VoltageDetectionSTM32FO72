@@ -80,18 +80,19 @@ int main(void)
 	led5_init();
 	led6_init();
 	//Check if reset is due to independent watchdog.
-	if((RCC->CSR & RCC_CSR_IWDGRSTF) == 0X20000000)
+	if((RCC->CSR & RCC_CSR_IWDGRSTF) == watchdog_reset)
 	{
 		HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
 		RCC->CSR |= RCC_CSR_RMVF;
 	}
+	//watchdog intialization.
 	watchdog_init();
 	//Button intialization
-	BSP_PB_Init(BUTTON_USER,BUTTON_MODE_EXTI);
-	vCreateSemaphore();
+	BSP_PB_Init(BUTTON_USER,BUTTON_MODE_GPIO);
+	//vCreateSemaphore();
 	vCreateAllTAsk();
-
 	//Start the scheduler.
+	vTaskStartScheduler();
 	
 	while (1)
   {

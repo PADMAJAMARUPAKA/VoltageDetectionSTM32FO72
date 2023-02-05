@@ -73,28 +73,7 @@ void HardFault_Handler(void)
 }
 void EXTI0_1_IRQHandler(void)
 {
-	BaseType_t xHigherPriorityTaskWoken;
-	xHigherPriorityTaskWoken = pdFALSE;
-	if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_SET)
-	{
-		
-		if(xSemaphoreGiveFromISR( xSuspendSemaphore, &xHigherPriorityTaskWoken)== pdTRUE)
-		{
-		//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-		}
-		EXTI->PR=0x00000001;
-	}
-	//RV 
-	if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_RESET)
-	{
-		//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-			xSemaphoreGiveFromISR( xResumeSemaphore, &xHigherPriorityTaskWoken );
-			EXTI->PR=0x00000001;
-	}
-	if(xHigherPriorityTaskWoken == pdTRUE){
-//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);	
-	portYIELD_FROM_ISR(xHigherPriorityTaskWoken );
-	}
+
 }
 	
 
