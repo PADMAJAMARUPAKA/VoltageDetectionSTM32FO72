@@ -28,7 +28,7 @@
 #include "semphr.h"
 #include "led.h"
 #include "tasks_list.h"
-
+#include "adc.h"
 
 
 
@@ -75,10 +75,15 @@ int main(void)
 	HAL_Init();
  /* Configure the system clock to 48 MHz */
   SystemClock_Config();
+	
 	led3_init();
 	led4_init();
 	led5_init();
 	led6_init();
+	AdcPin_init();
+	adc_init();
+	adc_start();
+
 	//Check if reset is due to independent watchdog.
 	if((RCC->CSR & RCC_CSR_IWDGRSTF) == watchdog_reset)
 	{

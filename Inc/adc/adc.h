@@ -8,8 +8,8 @@
  *****************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __LED_H
-#define __LED_H
+#ifndef __ADC_H
+#define __ADC_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +17,8 @@ extern "C" {
 
 /**** Includes ****************************************************************/
 /**** Public macros ***********************************************************/
-
+#define adc_lowerlimit 310
+#define adc_higherlimit 0X60E
 /**** Public types ************************************************************/
 
 /**** Public constants ********************************************************/
@@ -29,15 +30,21 @@ extern "C" {
 
 
 /*!*****************************************************************************
- * \brief Intialiaze the LED.
+ * \brief Intialiaze the adc peripheral and analog watchdog.
  * \param 
  * \return 
  ******************************************************************************/
-void led3_init(void) ;
-void led4_init(void) ;
-void led5_init(void) ;
-void led6_init(void) ;
-void AdcPin_init(void);
+void adc_init(void) ;
+/*!*****************************************************************************
+ * \brief Start the adc conversion.
+ * \param 
+ * \return 
+ ******************************************************************************/
+void adc_start(void);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

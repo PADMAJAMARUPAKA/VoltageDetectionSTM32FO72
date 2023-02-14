@@ -9,6 +9,7 @@
 #include "stm32f072b_discovery.h"
 
 
+
 /**** Private macros **********************************************************/
 
 /**** Private types ***********************************************************/
@@ -63,4 +64,13 @@ void led6_init(void) {
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Pin = LED6_PIN;
   HAL_GPIO_Init(LED6_GPIO_PORT, &GPIO_InitStruct);
+}
+void AdcPin_init(void){
+	RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+	 GPIO_InitStruct.Pin = GPIO_PIN_0;
+	 GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	
 }
