@@ -17,7 +17,8 @@ extern "C" {
 
 /**** Includes ****************************************************************/
 /**** Public macros ***********************************************************/
-#define watchdog_peiodicity	100
+#define watchdog_peiodicity	1000
+#define eventg ( 1UL << 0UL )
 /**** Public types ************************************************************/
 
 /**** Public constants ********************************************************/
@@ -32,8 +33,8 @@ void vWatchdogTask(void *pvParameters);
  * \param 
  * \return 
  ******************************************************************************/
-static void vSuspensionTask(void *pvParameters);
-
+ void vAdcTask(void *pvParameters);
+void vAdcMeasurementTask(void *pvParameters);
 /*!*****************************************************************************
  * \brief SuspensionTask
  * \param 

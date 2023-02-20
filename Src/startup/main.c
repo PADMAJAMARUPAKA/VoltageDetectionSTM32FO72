@@ -58,8 +58,7 @@ static void Error_Handler(void);
   * @param  None
   * @retval None
   */
-int main(void)
-{
+int main(void) {
   /* This sample code shows how to use GPIO HAL API to toggle LED3, LED4, LED5 and LED6 IOs
     in an infinite loop. */
 
@@ -82,7 +81,7 @@ int main(void)
 	led6_init();
 	AdcPin_init();
 	adc_init();
-	adc_start();
+	//adc_start();
 
 	//Check if reset is due to independent watchdog.
 	if((RCC->CSR & RCC_CSR_IWDGRSTF) == watchdog_reset)
@@ -97,7 +96,7 @@ int main(void)
 	//vCreateSemaphore();
 	vCreateAllTAsk();
 	//Start the scheduler.
-	vTaskStartScheduler();
+	//vTaskStartScheduler();
 	
 	while (1)
   {

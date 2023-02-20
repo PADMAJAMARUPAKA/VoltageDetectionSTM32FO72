@@ -23,11 +23,14 @@
 #include "main.h"
 #include "stm32f0xx_it.h"
 #include "stm32f0xx_hal_exti.h"
+#include "event_groups.h"
+#include "tasks_list.h"
 
 extern SemaphoreHandle_t xSuspendSemaphore;
 extern SemaphoreHandle_t xResumeSemaphore;
 extern StaticSemaphore_t xSemaphoreBuffer1;
 extern StaticSemaphore_t xSemaphoreBuffer2;
+extern EventGroupHandle_t xEventGroup;
 //#include "FreeRTOS.h"
 
 /** @addtogroup STM32F0xx_HAL_Examples
@@ -77,8 +80,22 @@ void EXTI0_1_IRQHandler(void)
 }
 void ADC1_COMP_IRQHandler (void)
 {
-			HAL_GPIO_WritePin(LED6_GPIO_PORT, LED6_PIN,GPIO_PIN_SET);
+	ADC1->ISR = ADC_ISR_AWD;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	BaseType_t rt;
+	//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
+		//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
+	rt=xEventGroupSetBitsFromISR(xEventGroup,eventg,&xHigherPriorityTaskWoken);
+	//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
+	if(rt==pdFALSE)	{
+		//HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+	}
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	
+	
 }
+	
+	
 	
 
 

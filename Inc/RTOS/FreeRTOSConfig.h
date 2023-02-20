@@ -74,10 +74,11 @@ to exclude the API function. */
 #define INCLUDE_vTaskResume 			1
 /*Software timer related functions.*/
 #define configUSE_TIMERS					1
-#define configTIMER_QUEUE_LENGTH	5
-#define configTIMER_TASK_PRIORITY		3
+#define configTIMER_QUEUE_LENGTH	300
+#define configTIMER_TASK_PRIORITY		4
 #define configTIMER_TASK_STACK_DEPTH 100
-
+#define INCLUDE_xEventGroupSetBitFromISR        1
+#define INCLUDE_xTimerPendFunctionCall          1
 /* This is the raw value as per the Cortex-M3 NVIC.  Values can be 255
 (lowest) to 0 (1?) (highest). */
 #define configKERNEL_INTERRUPT_PRIORITY 		255

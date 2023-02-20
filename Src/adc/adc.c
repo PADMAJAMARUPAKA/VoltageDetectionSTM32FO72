@@ -36,7 +36,7 @@
 	{
 	/* For robust implementation, add here time-out management */
 	}
-	 //CALIBRATION	
+	 //CALIBRATION
 	
 	if ((ADC1->CR & ADC_CR_ADEN) != 0) /* (1) */
 	{
@@ -46,7 +46,7 @@
 	{
 /* For robust implementation, add here time-out management */
 	}
-	HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+
 	ADC1->CFGR1 &= ~ADC_CFGR1_DMAEN; /* (3) */
 	ADC1->CR |= ADC_CR_ADCAL; /* (4) */
 	while ((ADC1->CR & ADC_CR_ADCAL) != 0) /* (5) */
@@ -65,7 +65,7 @@
 	}
 	ADC1->CFGR2 &= (~ADC_CFGR2_CKMODE);
 	//Select continuous mode and analog watchdog
-	ADC1->CFGR1 |= ADC_CFGR1_CONT|ADC_CFGR1_AWDEN;
+	ADC1->CFGR1 |= ADC_CFGR1_AWDEN;
 	//Select overwrite the data
 	ADC1->CFGR1 |= ADC_CFGR1_OVRMOD; 
 	//Select 10 bit Resolution.
@@ -73,7 +73,7 @@
 	//select channel0
 	ADC1->CHSELR |= ADC_CHSELR_CHSEL10;
 	//select sampling time
-	ADC1->SMPR |= ADC_SMPR_SMP_0;
+	ADC1->SMPR |= ADC_SMPR_SMP_0|ADC_SMPR_SMP_1|ADC_SMPR_SMP_2;
 	ADC1->TR	=(adc_higherlimit<<16)+adc_lowerlimit;
 	//enable analog watchdog interrupt
 	ADC1->IER = ADC_IER_AWDIE;
