@@ -8,8 +8,8 @@
  *****************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __LED_H
-#define __LED_H
+#ifndef __SPI_H
+#define __SPI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,16 +29,21 @@ extern "C" {
 
 
 /*!*****************************************************************************
- * \brief Intialiaze the LED.
+ * \brief Intialiaze the spi communication
  * \param 
  * \return 
  ******************************************************************************/
-void led3_init(void) ;
-void led4_init(void) ;
-void led5_init(void) ;
-void led6_init(void) ;
-void AdcPin_init(void);
-void SpiPin_init(void);
+void spi_init(void) ;
+/*!*****************************************************************************
+ * \brief Start the spi transfer.
+ * \param 
+ * \return 
+ ******************************************************************************/
+void spi_start(void);
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

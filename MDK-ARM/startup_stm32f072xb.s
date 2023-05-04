@@ -36,8 +36,7 @@ Stack_Mem       SPACE   Stack_Size
 __initial_sp
 
 
-; <h> Heap Configuration
-;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+7;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
 Heap_Size      EQU     0x200;
@@ -119,7 +118,8 @@ Reset_Handler    PROC
                  EXPORT  Reset_Handler                 [WEAK]
         IMPORT  __main
         IMPORT  SystemInit  
-                 LDR     R0, =SystemInit
+
+				 LDR     R0, =SystemInit
                  BLX     R0
                  LDR     R0, =__main
                  BX      R0

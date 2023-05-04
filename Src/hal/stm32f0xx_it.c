@@ -26,11 +26,13 @@
 #include "event_groups.h"
 #include "tasks_list.h"
 
+
 extern SemaphoreHandle_t xSuspendSemaphore;
 extern SemaphoreHandle_t xResumeSemaphore;
 extern StaticSemaphore_t xSemaphoreBuffer1;
 extern StaticSemaphore_t xSemaphoreBuffer2;
 extern EventGroupHandle_t xEventGroup;
+extern uint16_t adc_measured;
 //#include "FreeRTOS.h"
 
 /** @addtogroup STM32F0xx_HAL_Examples
@@ -78,8 +80,21 @@ void EXTI0_1_IRQHandler(void)
 {
 
 }
+void SPI2_IRQHandler(void){
+	SPI2->DR = adc_measured;
+	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+	while(((SPI2->SR & SPI_SR_FTLVL_0)!=SPI_SR_FTLVL_0)&&((SPI2->SR & SPI_SR_FTLVL_1)!=SPI_SR_FTLVL_1)){
+		}
+	while(((SPI2->SR & SPI_SR_BSY)!=SPI_SR_BSY)){
+	}
+	SPI2->CR1 &=~ SPI_CR1_SPE;
+	
+	HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+}
+
 void ADC1_COMP_IRQHandler (void)
 {
+	
 	ADC1->ISR = ADC_ISR_AWD;
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	BaseType_t rt;

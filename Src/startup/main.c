@@ -29,6 +29,7 @@
 #include "led.h"
 #include "tasks_list.h"
 #include "adc.h"
+#include "spi.h"
 
 
 
@@ -80,7 +81,10 @@ int main(void) {
 	led5_init();
 	led6_init();
 	AdcPin_init();
+	SpiPin_init();
 	adc_init();
+	spi_init();
+	
 	//adc_start();
 
 	//Check if reset is due to independent watchdog.

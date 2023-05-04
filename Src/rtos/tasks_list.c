@@ -13,6 +13,7 @@
 #include "event_groups.h"
 #include "stm32f072b_discovery.h"
 #include "adc.h"
+#include	"spi.h"
 
 
 /**** Private macros **********************************************************/
@@ -34,6 +35,7 @@
 TaskHandle_t watchdog_handle;
 StaticEventGroup_t xCreatedEventGroup;
 EventGroupHandle_t xEventGroup;
+uint16_t adc_measured;
 
 void vWatchdogTask(void *pvParameters);
 /**** Public function definitions *********************************************/
@@ -50,6 +52,7 @@ void vCreateAllTAsk(void){
 	StaticTask_t xTaskBuffer2;
 	StackType_t xStack2[ 70 ];
 	StaticTask_t xTaskBuffer3;
+
 	StackType_t xStack3[ 70 ];
 	watchdog_handle=xTaskCreateStatic( vWatchdogTask,"watchdog",70,NULL,1,xStack,&xTaskBuffer);
 	xTaskCreateStatic( vAdcTask,"adc",70,NULL,3,xStack2,&xTaskBuffer2);
@@ -70,7 +73,7 @@ void vWatchdogTask(void *pvParameters){
 	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
 	//xEventGroupSetBits( xEventGroup,eventg);
 	//ADC1->CR |= ADC_CR_ADSTART;
-	//adc_start();
+	
 	//vTaskSuspend(watchdog_handle);
 	vTaskDelay(pdMS_TO_TICKS(watchdog_peiodicity));
 	}
@@ -78,7 +81,9 @@ void vWatchdogTask(void *pvParameters){
 void vAdcTask(void *pvParameters)	{
 		for(;;){
 		xEventGroupWaitBits(xEventGroup,eventg,pdTRUE,pdFALSE,portMAX_DELAY);
-		HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+		adc_measured =	ADC1->DR;		
+		//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+		spi_start();
 		}
 }
 
