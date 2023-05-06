@@ -10,6 +10,10 @@
 
 
 
+
+
+
+
 /**** Private macros **********************************************************/
 
 /**** Private types ***********************************************************/
@@ -20,6 +24,9 @@
 
 /**** Private variables *******************************************************/
 static GPIO_InitTypeDef  GPIO_InitStruct;
+//EXTI_InitTypeDef   EXTI_InitStructure;
+//GPIO_InitTypeDef   GPIO_InitStructure;
+//NVIC_InitTypeDef   NVIC_InitStructure;
 /**** Public constants ********************************************************/
 
 /**** Public variables ********************************************************/
@@ -28,6 +35,61 @@ static GPIO_InitTypeDef  GPIO_InitStruct;
 
 /******************************************************************************/
 /**** Private function definitions ********************************************/
+void SlaveReady_pin(void){
+	
+	  /* Enable GPIOA clock */
+	
+  //RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+
+  /* Configure PA0 pin as input floating */
+  GPIO_InitStruct.Pin = GPIO_PIN_4;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /* Enable SYSCFG clock */
+  //RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGCOMPEN;
+  
+  /* Connect EXTI0 Line to PA0 pin */
+  //SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+	SYSCFG->EXTICR[1]	|= 	SYSCFG_EXTICR2_EXTI4_PA;
+
+  /* Configure EXTI0 line */
+  //EXTI_InitStructure.EXTI_Line = EXTI_Line0;
+  //EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  //EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+  //EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  //EXTI_Init(&EXTI_InitStructure);
+	EXTI->IMR = 0x0010; /* (3) */
+	EXTI->RTSR = 0x0010; /* (4) */
+	//EXTI->FTSR = 0x0010;
+
+  /* Enable and set EXTI0 Interrupt */
+  //NVIC_InitStructure.NVIC_IRQChannel = EXTI0_1_IRQn;
+  //NVIC_InitStructure.NVIC_IRQChannelPriority = 0x00;
+  //NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  //NVIC_Init(&NVIC_InitStructure);
+	//RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+	//GPIO_InitStruct.Mode  = GPIO_MODE_IT_RISING;
+  //GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  //GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	//GPIO_InitStruct.Pin = GPIO_PIN_4;
+	//HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	NVIC_EnableIRQ(EXTI4_15_IRQn); /* (1) */
+	NVIC_SetPriority(EXTI4_15_IRQn,0); /* (2) */
+
+}
+void MasterReady_pin(void){
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+	GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.Pin = GPIO_PIN_5;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
 void led3_init(void) {
 	/* -1- Enable each GPIO Clock (to be able to program the configuration registers) */
   LED3_GPIO_CLK_ENABLE();

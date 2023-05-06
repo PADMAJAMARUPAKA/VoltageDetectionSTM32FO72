@@ -81,9 +81,10 @@ void vWatchdogTask(void *pvParameters){
 void vAdcTask(void *pvParameters)	{
 		for(;;){
 		xEventGroupWaitBits(xEventGroup,eventg,pdTRUE,pdFALSE,portMAX_DELAY);
-		adc_measured =	ADC1->DR;		
+		adc_measured =	ADC1->DR;	
+		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
 		//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
-		spi_start();
+		//spi_start();
 		}
 }
 

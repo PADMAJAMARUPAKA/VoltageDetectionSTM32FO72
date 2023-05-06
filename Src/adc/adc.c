@@ -78,7 +78,7 @@
 	//enable analog watchdog interrupt
 	ADC1->IER = ADC_IER_AWDIE;
 	NVIC_EnableIRQ(ADC1_COMP_IRQn); /* (7) */
-	NVIC_SetPriority(ADC1_COMP_IRQn,0);
+	NVIC_SetPriority(ADC1_COMP_IRQn,2);
 }
 void adc_start(void){
 	ADC1->CR |= ADC_CR_ADSTART;

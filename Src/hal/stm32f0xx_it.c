@@ -25,6 +25,7 @@
 #include "stm32f0xx_hal_exti.h"
 #include "event_groups.h"
 #include "tasks_list.h"
+#include	"spi.h"
 
 
 extern SemaphoreHandle_t xSuspendSemaphore;
@@ -79,6 +80,14 @@ void HardFault_Handler(void)
 void EXTI0_1_IRQHandler(void)
 {
 
+}
+void EXTI4_15_IRQHandler(void)
+{
+	
+	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
+	spi_start();
+	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+	EXTI->PR |= EXTI_PR_PIF4;
 }
 void SPI2_IRQHandler(void){
 	SPI2->DR = adc_measured;

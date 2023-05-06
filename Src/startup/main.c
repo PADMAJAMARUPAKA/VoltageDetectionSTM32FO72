@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
@@ -30,8 +31,7 @@
 #include "tasks_list.h"
 #include "adc.h"
 #include "spi.h"
-
-
+#include "stm32f0xx_hal_rcc.h"
 
 
 
@@ -82,8 +82,11 @@ int main(void) {
 	led6_init();
 	AdcPin_init();
 	SpiPin_init();
+	SlaveReady_pin();
+	MasterReady_pin();
 	adc_init();
 	spi_init();
+	
 	
 	//adc_start();
 
@@ -162,6 +165,9 @@ static void Error_Handler(void)
   {
   }
 }
+
+
+
 
 #ifdef  USE_FULL_ASSERT
 

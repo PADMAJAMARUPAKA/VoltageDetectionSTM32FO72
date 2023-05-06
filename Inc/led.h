@@ -39,6 +39,8 @@ void led5_init(void) ;
 void led6_init(void) ;
 void AdcPin_init(void);
 void SpiPin_init(void);
+void SlaveReady_pin(void);
+void MasterReady_pin(void);
 #ifdef __cplusplus
 }
 #endif
