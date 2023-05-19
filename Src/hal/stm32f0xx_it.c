@@ -28,10 +28,7 @@
 #include	"spi.h"
 
 
-extern SemaphoreHandle_t xSuspendSemaphore;
-extern SemaphoreHandle_t xResumeSemaphore;
-extern StaticSemaphore_t xSemaphoreBuffer1;
-extern StaticSemaphore_t xSemaphoreBuffer2;
+
 extern EventGroupHandle_t xEventGroup;
 extern uint16_t adc_measured;
 //#include "FreeRTOS.h"
@@ -89,33 +86,21 @@ void EXTI4_15_IRQHandler(void)
 	EXTI->PR |= EXTI_PR_PIF4;
 }
 void SPI2_IRQHandler(void){
-	//SPI2->DR = adc_measured;
 	SPI2->DR = adc_measured;
-	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
 	while(((SPI2->SR & SPI_SR_FTLVL_0)!=SPI_SR_FTLVL_0)&&((SPI2->SR & SPI_SR_FTLVL_1)!=SPI_SR_FTLVL_1)){
 		}
 	while(((SPI2->SR & SPI_SR_BSY)!=SPI_SR_BSY)){
 	}
 	SPI2->CR1 &=~ SPI_CR1_SPE;
-	
-	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
 }
 
 void ADC1_COMP_IRQHandler (void)
 {
-		HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
 	adc_measured =	ADC1->DR;	
-
 	ADC1->ISR |= ADC_ISR_AWD;
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	BaseType_t rt;
-	//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
-		//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
-	rt=xEventGroupSetBitsFromISR(xEventGroup,eventg,&xHigherPriorityTaskWoken);
-	//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
-	if(rt==pdFALSE)	{
-	
-	}
+	xEventGroupSetBitsFromISR(xEventGroup,eventg,&xHigherPriorityTaskWoken);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	
 	

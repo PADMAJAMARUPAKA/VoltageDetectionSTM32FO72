@@ -64,8 +64,7 @@ static void Error_Handler(void);
 int main(void) {
   /* This sample code shows how to use GPIO HAL API to toggle LED3, LED4, LED5 and LED6 IOs
     in an infinite loop. */
-
-  /* STM32F0xx HAL library initialization:
+	/* STM32F0xx HAL library initialization:
        - Configure the Flash prefetch
        - Systick timer is configured by default as source of time base, but user 
          can eventually implement his proper time base source (a general purpose 
@@ -74,8 +73,6 @@ int main(void) {
          handled in milliseconds basis.
        - Low Level Initialization
      */
-	EventRecorderInitialize (EventRecordAll, 1);
-
 	HAL_Init();
  /* Configure the system clock to 48 MHz */
   SystemClock_Config();
@@ -95,16 +92,10 @@ int main(void) {
 	MasterReady_pin();
 	adc_init();
 	spi_init();
-	
-	
-	//adc_start();
-
-
 	//watchdog intialization.
 	watchdog_init();
 	//Button intialization
 	BSP_PB_Init(BUTTON_USER,BUTTON_MODE_GPIO);
-	//vCreateSemaphore();
 	vCreateAllTAsk();
 	//Start the scheduler.
 	vTaskStartScheduler();

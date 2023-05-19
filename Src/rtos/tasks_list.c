@@ -61,9 +61,6 @@ void vCreateAllTAsk(void){
 	watchdog_handle=xTaskCreateStatic( vWatchdogTask,"watchdog",70,NULL,1,xStack,&xTaskBuffer);
 	xTaskCreateStatic( vAdcTask,"adc",70,NULL,3,xStack2,&xTaskBuffer2);
 	xTaskCreateStatic( vAdcMeasurementTask,"adcMeasurementTask",70,NULL,2,xStack3,&xTaskBuffer3);
-	//if(watchdog_handle!=NULL){
-		//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
-	//}
 	vTaskStartScheduler();
 }
 
@@ -74,27 +71,15 @@ void vWatchdogTask(void *pvParameters){
 	if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_RESET)	{
 	feed_watchdog();
 	}
-	//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
-	//xEventGroupSetBits( xEventGroup,eventg);
-	//ADC1->CR |= ADC_CR_ADSTART;
-	
-	//vTaskSuspend(watchdog_handle);
 	vTaskDelay(pdMS_TO_TICKS(watchdog_peiodicity));
 	}
 }
 void vAdcTask(void *pvParameters)	{
 		for(;;){
 		xEventGroupWaitBits(xEventGroup,eventg,pdTRUE,pdFALSE,portMAX_DELAY);
-	
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
 		HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
-			i++;
-		printf("%" PRIu16 "\n",adc_measured);
-		printf("%" PRIu16 "\n",i);
-		//HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
-		//vTaskDelay(pdMS_TO_TICKS(1000));
-		//spi_start();
-		}
+	}
 }
 
 
@@ -102,7 +87,6 @@ void vAdcMeasurementTask(void *pvParameters)	{
 	
 		for(;;){
 		adc_start();
-
 		vTaskDelay(pdMS_TO_TICKS(1000));
 		}
 }
