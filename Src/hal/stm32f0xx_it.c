@@ -83,13 +83,13 @@ void EXTI0_1_IRQHandler(void)
 }
 void EXTI4_15_IRQHandler(void)
 {
-	
 	HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
 	spi_start();
-	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+	HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
 	EXTI->PR |= EXTI_PR_PIF4;
 }
 void SPI2_IRQHandler(void){
+	//SPI2->DR = adc_measured;
 	SPI2->DR = adc_measured;
 	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
 	while(((SPI2->SR & SPI_SR_FTLVL_0)!=SPI_SR_FTLVL_0)&&((SPI2->SR & SPI_SR_FTLVL_1)!=SPI_SR_FTLVL_1)){
@@ -98,13 +98,15 @@ void SPI2_IRQHandler(void){
 	}
 	SPI2->CR1 &=~ SPI_CR1_SPE;
 	
-	HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+	//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
 }
 
 void ADC1_COMP_IRQHandler (void)
 {
-	
-	ADC1->ISR = ADC_ISR_AWD;
+		HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	adc_measured =	ADC1->DR;	
+
+	ADC1->ISR |= ADC_ISR_AWD;
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	BaseType_t rt;
 	//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
@@ -112,7 +114,7 @@ void ADC1_COMP_IRQHandler (void)
 	rt=xEventGroupSetBitsFromISR(xEventGroup,eventg,&xHigherPriorityTaskWoken);
 	//HAL_GPIO_WritePin(LED5_GPIO_PORT, LED5_PIN,GPIO_PIN_SET);
 	if(rt==pdFALSE)	{
-		//HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+	
 	}
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	

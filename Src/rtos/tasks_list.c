@@ -14,6 +14,9 @@
 #include "stm32f072b_discovery.h"
 #include "adc.h"
 #include	"spi.h"
+#include "stdio.h"
+#include "stdio.h"
+#include "inttypes.h" 
 
 
 /**** Private macros **********************************************************/
@@ -36,6 +39,7 @@ TaskHandle_t watchdog_handle;
 StaticEventGroup_t xCreatedEventGroup;
 EventGroupHandle_t xEventGroup;
 uint16_t adc_measured;
+uint16_t i=0;
 
 void vWatchdogTask(void *pvParameters);
 /**** Public function definitions *********************************************/
@@ -70,7 +74,7 @@ void vWatchdogTask(void *pvParameters){
 	if(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_RESET)	{
 	feed_watchdog();
 	}
-	HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
+	//HAL_GPIO_TogglePin(LED4_GPIO_PORT, LED4_PIN);
 	//xEventGroupSetBits( xEventGroup,eventg);
 	//ADC1->CR |= ADC_CR_ADSTART;
 	
@@ -81,9 +85,14 @@ void vWatchdogTask(void *pvParameters){
 void vAdcTask(void *pvParameters)	{
 		for(;;){
 		xEventGroupWaitBits(xEventGroup,eventg,pdTRUE,pdFALSE,portMAX_DELAY);
-		adc_measured =	ADC1->DR;	
+	
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
-		//HAL_GPIO_TogglePin(LED6_GPIO_PORT, LED6_PIN);
+		HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+			i++;
+		printf("%" PRIu16 "\n",adc_measured);
+		printf("%" PRIu16 "\n",i);
+		//HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+		//vTaskDelay(pdMS_TO_TICKS(1000));
 		//spi_start();
 		}
 }
@@ -93,7 +102,7 @@ void vAdcMeasurementTask(void *pvParameters)	{
 	
 		for(;;){
 		adc_start();
-		HAL_GPIO_TogglePin(LED5_GPIO_PORT, LED5_PIN);
+
 		vTaskDelay(pdMS_TO_TICKS(1000));
 		}
 }

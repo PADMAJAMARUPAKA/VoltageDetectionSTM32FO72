@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "EventRecorder.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
@@ -31,7 +31,9 @@
 #include "tasks_list.h"
 #include "adc.h"
 #include "spi.h"
+#include "stdio.h"
 #include "stm32f0xx_hal_rcc.h"
+#include "EventRecorder.h"  
 
 
 
@@ -72,11 +74,18 @@ int main(void) {
          handled in milliseconds basis.
        - Low Level Initialization
      */
+	EventRecorderInitialize (EventRecordAll, 1);
+
 	HAL_Init();
  /* Configure the system clock to 48 MHz */
   SystemClock_Config();
-	
 	led3_init();
+	//Check if reset is due to independent watchdog.
+	if((RCC->CSR & RCC_CSR_IWDGRSTF) == watchdog_reset)
+	{
+		HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
+		RCC->CSR |= RCC_CSR_RMVF;
+	}
 	led4_init();
 	led5_init();
 	led6_init();
@@ -90,12 +99,7 @@ int main(void) {
 	
 	//adc_start();
 
-	//Check if reset is due to independent watchdog.
-	if((RCC->CSR & RCC_CSR_IWDGRSTF) == watchdog_reset)
-	{
-		HAL_GPIO_TogglePin(LED3_GPIO_PORT, LED3_PIN);
-		RCC->CSR |= RCC_CSR_RMVF;
-	}
+
 	//watchdog intialization.
 	watchdog_init();
 	//Button intialization
@@ -103,7 +107,7 @@ int main(void) {
 	//vCreateSemaphore();
 	vCreateAllTAsk();
 	//Start the scheduler.
-	//vTaskStartScheduler();
+	vTaskStartScheduler();
 	
 	while (1)
   {
